@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>R2 图床管理系统</title>
+  <style>
+    :root {
+      --background-image: url('{{BACKGROUND_IMAGE}}');
+      --primary-color: #3b82f6;
+      --primary-hover: #2563eb;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-radius: 16px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-image: var(--background-image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text-primary);
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+      z-index: -1;
+    }
+    
+    /* 登录页面 */
+    #loginPage { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      padding: 20px;
+    }
+    
+    .login-box { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px); 
+      padding: 48px 40px; 
+      border-radius: var(--border-radius); 
+      box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5);
+      width: 100%;
+      max-width: 400px;
+      animation: fadeInUp 0.6s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .login-box h1 { 
+      margin-bottom: 32px; 
+      color: var(--text-primary); 
+      font-size: 28px; 
+      text-align: center;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    
+    .login-box input { 
+      width: 100%; 
+      padding: 14px 16px; 
+      border: 2px solid rgba(0, 0, 0, 0.1); 
+      border-radius: 12px; 
+      margin-bottom: 16px; 
+      font-size: 15px; 
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    
+    .login-box input:focus {
+      border-color: var(--primary-color);
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    
+    .login-box button { 
+      width: 100%; 
+      padding: 14px; 
+      background: var(--primary-color); 
+      color: white; 
+      border: none; 
+      border-radius: 12px; 
+      cursor: pointer; 
+      font-size: 15px; 
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .login-box button:hover { 
+      background: var(--primary-hover); 
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .login-box button:active {
+      transform: translateY(0);
+    }
+    
+    .error-msg { 
+      color: var(--danger-color); 
+      font-size: 13px; 
+      margin-top: -12px; 
+      margin-bottom: 16px; 
+      padding: 8px 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 8px;
+    }
+    
+    /* 主页面 */
+    #mainPage { display: none; animation: fadeIn 0.6s ease; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .header { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px); 
+      padding: 24px 40px; 
+      box-shadow: var(--shadow-md);
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header h1 { 
+      font-size: 22px; 
+      color: var(--text-primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logout-btn { 
+      padding: 10px 20px; 
+      background: rgba(0, 0, 0, 0.05); 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+    
+    .logout-btn:hover { 
+      background: rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    .container { 
+      max-width: 1600px; 
+      margin: 0 auto; 
+      padding: 40px 40px 80px;
+    }
+    
+    .breadcrumb { 
+      margin-bottom: 24px; 
+      font-size: 14px; 
+      color: var(--text-secondary); 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px);
+      padding: 16px 20px; 
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .breadcrumb a { 
+      color: var(--primary-color); 
+      text-decoration: none; 
+      cursor: pointer;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    
+    .breadcrumb a:hover { 
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+    
+    .toolbar { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px); 
+      padding: 24px; 
+      border-radius: var(--border-radius); 
+      margin-bottom: 32px; 
+      display: flex; 
+      gap: 16px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      align-items: center;
+    }
+    
+    .toolbar input[type="file"] { 
+      flex: 1; 
+      padding: 12px 16px; 
+      border: 2px dashed rgba(0, 0, 0, 0.2); 
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    
+    .toolbar input[type="file"]:hover {
+      border-color: var(--primary-color);
+      background: rgba(255, 255, 255, 0.8);
+    }
+    
+    .toolbar button { 
+      padding: 12px 28px; 
+      background: var(--primary-color); 
+      color: white; 
+      border: none; 
+      border-radius: 12px; 
+      cursor: pointer; 
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+    
+    .toolbar button:hover { 
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* 文件夹网格 */
+    .folders { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+      gap: 20px; 
+      margin-bottom: 40px;
+    }
+    
+    .folder-item { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px); 
+      padding: 28px 20px; 
+      border-radius: var(--border-radius); 
+      cursor: pointer; 
+      text-align: center; 
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .folder-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), #8b5cf6);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    
+    .folder-item:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .folder-item:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .folder-icon { 
+      font-size: 56px; 
+      margin-bottom: 12px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+    
+    .folder-name { 
+      font-size: 14px; 
+      color: var(--text-primary); 
+      word-break: break-all;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    
+    /* 图片画廊 */
+    .gallery { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+      gap: 24px;
+    }
+    
+    .image-card { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px); 
+      border-radius: var(--border-radius); 
+      overflow: hidden; 
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .image-card:hover { 
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .image-card img { 
+      width: 100%; 
+      height: 240px; 
+      object-fit: cover; 
+      cursor: pointer;
+      transition: transform 0.4s ease;
+    }
+    
+    .image-card:hover img {
+      transform: scale(1.05);
+    }
+    
+    .image-info { 
+      padding: 16px;
+    }
+    
+.image-name {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  word-break: break-word;
+  font-weight: 500;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Add the following line for future compatibility */
+  line-clamp: 2;
+}
+  
+    .image-actions { 
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    
+    .image-actions button { 
+      padding: 8px 12px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 12px; 
+      font-weight: 600;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    
+    .btn-copy { 
+      background: var(--success-color); 
+      color: white;
+    }
+    
+    .btn-copy:hover { 
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-download { 
+      background: var(--primary-color); 
+      color: white;
+    }
+    
+    .btn-download:hover { 
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-delete { 
+      background: var(--danger-color); 
+      color: white;
+    }
+    
+    .btn-delete:hover { 
+      background: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .empty { 
+      text-align: center; 
+      padding: 80px 40px; 
+      color: var(--text-secondary); 
+      font-size: 15px; 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    .loading { 
+      text-align: center; 
+      padding: 60px 40px; 
+      color: var(--text-secondary); 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(59, 130, 246, 0.2);
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 12px;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .debug-info { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(20px);
+      padding: 16px 20px; 
+      border-radius: 12px; 
+      margin-bottom: 24px; 
+      font-size: 13px; 
+      color: var(--text-secondary);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .container { padding: 24px 20px 60px; }
+      .header { padding: 20px 24px; }
+      .header h1 { font-size: 18px; }
+      .toolbar { flex-direction: column; }
+      .toolbar input[type="file"], .toolbar button { width: 100%; }
+      .gallery { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+      .image-card img { height: 180px; }
+      .folders { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loginPage">
+    <div class="login-box">
+      <h1>
+        <span>🔐</span>
+        <span>图床登录</span>
+      </h1>
+      <input type="password" id="passwordInput" placeholder="请输入密码" onkeypress="if(event.key==='Enter')login()" />
+      <div class="error-msg" id="loginError" style="display: none;"></div>
+      <button onclick="login()">登录进入</button>
+    </div>
+  </div>
+
+  <div id="mainPage">
+    <div class="header">
+      <h1>
+        <span>📷</span>
+        <span>R2 图床管理</span>
+      </h1>
+      <button class="logout-btn" onclick="logout()">退出登录</button>
+    </div>
+    
+    <div class="container">
+      <div class="breadcrumb" id="breadcrumb"></div>
+      
+      <div class="debug-info" id="debugInfo" style="display: none;"></div>
+      
+      <div class="toolbar">
+        <input type="file" id="fileInput" accept="image/*" multiple />
+        <button onclick="uploadFiles()">📤 上传图片</button>
+      </div>
+      
+      <div id="foldersContainer"></div>
+      <div id="galleryContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentPath = '';
+    
+    function checkAuth() {
+      const authToken = document.cookie.match(/auth_token=([^;]+)/)?.[1];
+      if (authToken) {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('mainPage').style.display = 'block';
+        loadImages();
+      }
+    }
+    
+    async function login() {
+      const password = document.getElementById('passwordInput').value;
+      const errorEl = document.getElementById('loginError');
+      
+      if (!password) {
+        errorEl.textContent = '请输入密码';
+        errorEl.style.display = 'block';
+        return;
+      }
+      
+      document.cookie = `auth_token=${password}; path=/; max-age=86400`;
+      errorEl.style.display = 'none';
+      
+      try {
+        const response = await fetch('/api/list');
+        if (response.ok) {
+          checkAuth();
+        } else {
+          errorEl.textContent = '密码错误，请重试';
+          errorEl.style.display = 'block';
+          document.cookie = 'auth_token=; path=/; max-age=0';
+        }
+      } catch (error) {
+        errorEl.textContent = '登录失败: ' + error.message;
+        errorEl.style.display = 'block';
+      }
+    }
+    
+    function logout() {
+      document.cookie = 'auth_token=; path=/; max-age=0';
+      location.reload();
+    }
+    
+    async function loadImages(path = '') {
+      currentPath = path;
+      document.getElementById('galleryContainer').innerHTML = '<div class="loading">加载中</div>';
+      document.getElementById('foldersContainer').innerHTML = '';
+      
+      try {
+        const response = await fetch(`/api/list?prefix=${encodeURIComponent(path)}`);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const data = await response.json();
+        console.log('API Response:', data);
+        
+        const debugInfo = document.getElementById('debugInfo');
+        debugInfo.style.display = 'block';
+        debugInfo.innerHTML = `
+          📂 当前路径: ${path || '根目录'} &nbsp;|&nbsp; 
+          📁 文件夹: ${data.folders?.length || 0} &nbsp;|&nbsp; 
+          🖼️ 图片: ${data.files?.length || 0}
+        `;
+        
+        updateBreadcrumb(path);
+        
+        if (data.folders && data.folders.length > 0) {
+          const foldersHtml = data.folders.map(folder => {
+            const folderName = folder.replace(path, '').replace(/\/$/, '');
+            return `
+              <div class="folder-item" onclick="loadImages('${folder}')">
+                <div class="folder-icon">📁</div>
+                <div class="folder-name">${folderName}</div>
+              </div>
+            `;
+          }).join('');
+          document.getElementById('foldersContainer').innerHTML = `<div class="folders">${foldersHtml}</div>`;
+        }
+        
+        if (data.files && data.files.length > 0) {
+          const galleryHtml = data.files.map(file => `
+            <div class="image-card">
+              <img src="${file.url}" alt="${file.name}" onclick="window.open('${file.url}', '_blank')" loading="lazy" />
+              <div class="image-info">
+                <div class="image-name" title="${file.name}">${file.name}</div>
+                <div class="image-actions">
+                  <button class="btn-copy" onclick="event.stopPropagation(); copyUrl('${file.url}')">复制</button>
+                  <button class="btn-download" onclick="event.stopPropagation(); window.open('${file.url}', '_blank')">查看</button>
+                  <button class="btn-delete" onclick="event.stopPropagation(); deleteImage('${file.key}')">删除</button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+          document.getElementById('galleryContainer').innerHTML = `<div class="gallery">${galleryHtml}</div>`;
+        } else if (!data.folders || data.folders.length === 0) {
+          document.getElementById('galleryContainer').innerHTML = `
+            <div class="empty">
+              <div class="empty-icon">📭</div>
+              <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">暂无图片</div>
+              <div style="font-size: 13px; opacity: 0.7;">请上传图片或检查R2存储桶配置</div>
+            </div>
+          `;
+        } else {
+          document.getElementById('galleryContainer').innerHTML = '';
+        }
+      } catch (error) {
+        console.error('Load error:', error);
+        document.getElementById('galleryContainer').innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">⚠️</div>
+            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px; color: var(--danger-color);">加载失败</div>
+            <div style="font-size: 13px; margin-bottom: 12px;">${error.message}</div>
+            <div style="font-size: 12px; opacity: 0.7; line-height: 1.6;">
+              请检查：<br>
+              • R2 bucket binding 是否已配置<br>
+              • R2_CUSTOM_DOMAIN 环境变量是否正确<br>
+              • R2 存储桶中是否有文件
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    function updateBreadcrumb(path) {
+      const parts = path.split('/').filter(p => p);
+      let breadcrumbHtml = '<a onclick="loadImages(\'\')">🏠 首页</a>';
+      let accumulatedPath = '';
+      
+      parts.forEach((part) => {
+        accumulatedPath += part + '/';
+        breadcrumbHtml += ` / <a onclick="loadImages('${accumulatedPath}')">${part}</a>`;
+      });
+      
+      document.getElementById('breadcrumb').innerHTML = breadcrumbHtml;
+    }
+    
+    async function uploadFiles() {
+      const files = document.getElementById('fileInput').files;
+      if (files.length === 0) {
+        alert('请先选择文件');
+        return;
+      }
+      
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('path', currentPath);
+        
+        try {
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          if (result.success) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (error) {
+          failCount++;
+        }
+      }
+      
+      document.getElementById('fileInput').value = '';
+      
+      if (successCount > 0) {
+        alert(`✅ 成功上传 ${successCount} 个文件${failCount > 0 ? `，${failCount} 个失败` : ''}`);
+        loadImages(currentPath);
+      } else {
+        alert('❌ 上传失败');
+      }
+    }
+    
+    async function deleteImage(key) {
+      if (!confirm('确定要删除这张图片吗？\n删除后无法恢复！')) return;
+      
+      try {
+        const response = await fetch('/api/delete', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('✅ 删除成功');
+          loadImages(currentPath);
+        } else {
+          alert(`❌ 删除失败: ${result.error}`);
+        }
+      } catch (error) {
+        alert(`❌ 删除失败: ${error.message}`);
+      }
+    }
+    
+    function copyUrl(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        alert('✅ 链接已复制到剪贴板');
+      }).catch(err => {
+        alert('❌ 复制失败: ' + err.message);
+      });
+    }
+    
+    checkAuth();
+  </script>
+</body>
+</html>
