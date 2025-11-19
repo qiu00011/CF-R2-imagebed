@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>R2 图床管理</title>
+  <style>
+    :root {
+      --background-image: url('{{BACKGROUND_IMAGE}}');
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+      background: #f5f5f5;
+      background-image: var(--background-image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+    
+    /* 为页面内容添加半透明背景，确保内容可读 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.85);
+      z-index: -1;
+    }
+    
+    /* 登录页面 */
+    #loginPage { display: flex; align-items: center; justify-content: center; height: 100vh; position: relative; z-index: 1; }
+    .login-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 40px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); width: 320px; }
+    .login-box h1 { margin-bottom: 24px; color: #333; font-size: 24px; text-align: center; }
+    .login-box input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 16px; font-size: 14px; background: rgba(255, 255, 255, 0.9); }
+    .login-box button { width: 100%; padding: 12px; background: #0066ff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .login-box button:hover { background: #0052cc; }
+    
+    /* 主界面 */
+    #mainPage { display: none; position: relative; z-index: 1; }
+    .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 20px 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 20px; color: #333; }
+    .logout-btn { padding: 8px 16px; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer; }
+    
+    .container { max-width: 1400px; margin: 40px auto; padding: 0 40px; }
+    
+    .breadcrumb { margin-bottom: 20px; font-size: 14px; color: #666; background: rgba(255, 255, 255, 0.9); padding: 12px 16px; border-radius: 8px; }
+    .breadcrumb a { color: #0066ff; text-decoration: none; cursor: pointer; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    
+    .toolbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .toolbar input[type="file"] { flex: 1; }
+    .toolbar button { padding: 10px 20px; background: #0066ff; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .toolbar button:hover { background: #0052cc; }
+    
+    .folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-bottom: 30px; }
+    .folder-item { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 20px; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .folder-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.15); transform: translateY(-2px); }
+    .folder-icon { font-size: 48px; margin-bottom: 8px; }
+    .folder-name { font-size: 14px; color: #333; word-break: break-all; }
+    
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+    .image-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.2s; }
+    .image-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.15); transform: translateY(-2px); }
+    .image-card img { width: 100%; height: 200px; object-fit: cover; cursor: pointer; }
+    .image-info { padding: 12px; }
+    .image-name { font-size: 14px; color: #333; margin-bottom: 8px; word-break: break-all; }
+    .image-actions { display: flex; gap: 8px; }
+    .image-actions button { flex: 1; padding: 6px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .btn-download { background: #0066ff; color: white; }
+    .btn-delete { background: #ff4444; color: white; }
+    .btn-copy { background: #28a745; color: white; }
+    
+    .empty { text-align: center; padding: 60px; color: #666; font-size: 14px; background: rgba(255, 255, 255, 0.9); border-radius: 8px; }
+    
+    .loading { text-align: center; padding: 40px; color: #666; background: rgba(255, 255, 255, 0.9); border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <!-- 登录页面 -->
+  <div id="loginPage">
+    <div class="login-box">
+      <h1>🔐 图床登录</h1>
+      <input type="password" id="passwordInput" placeholder="请输入密码" />
+      <button onclick="login()">登录</button>
+    </div>
+  </div>
+
+  <!-- 主页面 -->
+  <div id="mainPage">
+    <div class="header">
+      <h1>📷 R2 图床管理</h1>
+      <button class="logout-btn" onclick="logout()">退出登录</button>
+    </div>
+    
+    <div class="container">
+      <div class="breadcrumb" id="breadcrumb"></div>
+      
+      <div class="toolbar">
+        <input type="file" id="fileInput" accept="image/*" multiple />
+        <button onclick="uploadFiles()">上传图片</button>
+      </div>
+      
+      <div id="foldersContainer"></div>
+      <div id="galleryContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentPath = '';
+    
+    // 检查登录状态
+    function checkAuth() {
+      const authToken = document.cookie.match(/auth_token=([^;]+)/)?.[1];
+      if (authToken) {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('mainPage').style.display = 'block';
+        loadImages();
+      }
+    }
+    
+    // 登录
+    async function login() {
+      const password = document.getElementById('passwordInput').value;
+      document.cookie = `auth_token=${password}; path=/; max-age=86400`;
+      checkAuth();
+    }
+    
+    // 退出登录
+    function logout() {
+      document.cookie = 'auth_token=; path=/; max-age=0';
+      location.reload();
+    }
+    
+    // 加载图片列表
+    async function loadImages(path = '') {
+      currentPath = path;
+      document.getElementById('galleryContainer').innerHTML = '<div class="loading">加载中...</div>';
+      document.getElementById('foldersContainer').innerHTML = '';
+      
+      try {
+        const response = await fetch(`/api/list?prefix=${encodeURIComponent(path)}`);
+        const data = await response.json();
+        
+        // 更新面包屑
+        updateBreadcrumb(path);
+        
+        // 显示文件夹
+        if (data.folders && data.folders.length > 0) {
+          const foldersHtml = data.folders.map(folder => {
+            const folderName = folder.replace(path, '').replace(/\/$/, '');
+            return `
+              <div class="folder-item" onclick="loadImages('${folder}')">
+                <div class="folder-icon">📁</div>
+                <div class="folder-name">${folderName}</div>
+              </div>
+            `;
+          }).join('');
+          document.getElementById('foldersContainer').innerHTML = `<div class="folders">${foldersHtml}</div>`;
+        }
+        
+        // 显示图片
+        if (data.files && data.files.length > 0) {
+          const galleryHtml = data.files.map(file => `
+            <div class="image-card">
+              <img src="${file.url}" alt="${file.name}" onclick="window.open('${file.url}', '_blank')" />
+              <div class="image-info">
+                <div class="image-name">${file.name}</div>
+                <div class="image-actions">
+                  <button class="btn-copy" onclick="copyUrl('${file.url}')">复制链接</button>
+                  <button class="btn-download" onclick="window.open('${file.url}', '_blank')">查看</button>
+                  <button class="btn-delete" onclick="deleteImage('${file.key}')">删除</button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+          document.getElementById('galleryContainer').innerHTML = `<div class="gallery">${galleryHtml}</div>`;
+        } else if (!data.folders || data.folders.length === 0) {
+          document.getElementById('galleryContainer').innerHTML = '<div class="empty">暂无图片</div>';
+        } else {
+          document.getElementById('galleryContainer').innerHTML = '';
+        }
+      } catch (error) {
+        document.getElementById('galleryContainer').innerHTML = `<div class="empty">加载失败: ${error.message}</div>`;
+      }
+    }
+    
+    // 更新面包屑导航
+    function updateBreadcrumb(path) {
+      const parts = path.split('/').filter(p => p);
+      let breadcrumbHtml = '<a onclick="loadImages(\'\')">首页</a>';
+      let accumulatedPath = '';
+      
+      parts.forEach((part, index) => {
+        accumulatedPath += part + '/';
+        breadcrumbHtml += ` / <a onclick="loadImages('${accumulatedPath}')">${part}</a>`;
+      });
+      
+      document.getElementById('breadcrumb').innerHTML = breadcrumbHtml;
+    }
+    
+    // 上传文件
+    async function uploadFiles() {
+      const files = document.getElementById('fileInput').files;
+      if (files.length === 0) {
+        alert('请选择文件');
+        return;
+      }
+      
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('path', currentPath);
+        
+        try {
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          if (result.success) {
+            console.log(`上传成功: ${file.name}`);
+          } else {
+            alert(`上传失败: ${result.error}`);
+          }
+        } catch (error) {
+          alert(`上传失败: ${error.message}`);
+        }
+      }
+      
+      // 清空文件选择并刷新列表
+      document.getElementById('fileInput').value = '';
+      loadImages(currentPath);
+    }
+    
+    // 删除图片
+    async function deleteImage(key) {
+      if (!confirm('确定要删除这张图片吗?')) return;
+      
+      try {
+        const response = await fetch('/api/delete', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          loadImages(currentPath);
+        } else {
+          alert(`删除失败: ${result.error}`);
+        }
+      } catch (error) {
+        alert(`删除失败: ${error.message}`);
+      }
+    }
+    
+    // 复制URL
+    function copyUrl(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        alert('链接已复制到剪贴板');
+      });
+    }
+    
+    // 页面加载时检查登录状态
+    checkAuth();
+  </script>
+</body>
+</html>
