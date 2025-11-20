@@ -8,4 +8,5 @@ bucket_name = "your-bucket-name"
 [vars]
 R2_CUSTOM_DOMAIN = "https://images.yourdomain.com"
 PASSWORD = "your-secret-password"
-BACKGROUND_URL = "https://images.yourdomain.com/background.jpg"  # 可以是图片或视频
+BACKGROUND_URL = "https://image.hyeri.us.kg/bg.mp4"  # 可以是图片或视频
+
