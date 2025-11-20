@@ -3,12 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>R2 空间</title>
+  <title>R2 空间云盘</title>
   <style>
     :root {
-      /* 全局变量与自定义背景 */
-      --custom-bg-url: url('{{BACKGROUND_IMAGE}}');
-      
       /* 物理动效曲线 */
       --ease-spatial: cubic-bezier(0.32, 0.72, 0, 1);
       
@@ -55,7 +52,7 @@
       --input-bg: rgba(255,255,255,0.1);
       --input-focus-bg: rgba(255,255,255,0.15);
       
-      --bg-overlay: rgba(0,0,0,0.5);
+      --bg-overlay: rgba(0,0,0,0.6); /* 暗黑模式下加深视频/图片背景 */
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -63,7 +60,7 @@
     body { 
       font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
       background-color: var(--bg-base);
-      background-image: var(--bg-gradient);
+      background-image: var(--bg-gradient); /* 默认极光作为兜底 */
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
@@ -73,17 +70,23 @@
       position: relative;
     }
 
-    body::before {
-      content: '';
+    /* 动态背景层 (视频或图片) */
+    #bg-layer {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-image: var(--custom-bg-url);
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
       z-index: -2;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    #bg-layer video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     
+    /* 背景遮罩层（用于暗黑模式压暗自定义背景） */
     body::after {
       content: '';
       position: fixed;
@@ -92,7 +95,6 @@
       z-index: -1;
       pointer-events: none;
       transition: background 0.5s;
-      backdrop-filter: blur(0px);
     }
 
     @keyframes ambientLight {
@@ -111,9 +113,8 @@
     
     button:active { transform: scale(0.94); }
 
-    /* LOGO 样式 */
     .app-logo {
-      border-radius: 12px; /* iOS App Icon 圆角 */
+      border-radius: 12px;
       object-fit: cover;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       vertical-align: middle;
@@ -156,7 +157,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 15px; /* Logo 和文字的间距 */
+      gap: 15px;
     }
     
     .login-box input { 
@@ -203,11 +204,10 @@
       font-weight: 500;
     }
     
-    /* 主界面布局 */
+    /* 主界面 */
     #mainPage { display: none; padding-bottom: 100px; animation: fadeIn 0.6s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     
-    /* Header */
     .header { 
       position: fixed;
       top: 20px;
@@ -504,17 +504,19 @@
   </style>
 </head>
 <body>
+  <!-- 动态背景容器 -->
+  <div id="bg-layer"></div>
+
   <!-- 登录界面 -->
   <div id="loginPage">
     <div class="login-box">
       <h1>
-        <!-- 登录页 Logo -->
         <img src="https://image.hyeri.us.kg/icon.png" class="app-logo" style="width: 50px; height: 50px;" alt="Logo">
         <span>身份验证</span>
       </h1>
       <input type="password" id="passwordInput" placeholder="请输入访问密码" onkeypress="if(event.key==='Enter')login()" />
       <div class="error-msg" id="loginError" style="display: none;"></div>
-      <button onclick="login()">登录</button>
+      <button onclick="login()">解锁云盘</button>
     </div>
   </div>
 
@@ -522,9 +524,8 @@
   <div id="mainPage">
     <div class="header">
       <h1>
-        <!-- 顶部栏 Logo -->
         <img src="https://image.hyeri.us.kg/icon.png" class="app-logo" style="width: 32px; height: 32px;" alt="Logo">
-        <span>R2 空间</span>
+        <span>R2 空间云盘</span>
       </h1>
       <div class="header-controls">
         <button class="icon-btn" onclick="toggleTheme()" title="切换主题" id="themeBtn">☀️</button>
@@ -548,6 +549,33 @@
   </div>
 
   <script>
+    /* --- 背景处理逻辑 --- */
+    (function() {
+      const bgUrl = '{{BACKGROUND_IMAGE}}';
+      const bgContainer = document.getElementById('bg-layer');
+      
+      // 检查变量是否被替换 (如果未替换，通常保持原字符串)
+      if (bgUrl && bgUrl !== '{{' + 'BACKGROUND_IMAGE' + '}}' && bgUrl.trim() !== '') {
+        // 简单的扩展名检查
+        const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'm4v'];
+        // 获取路径部分（去除 ?query 等参数），然后取小写后缀
+        let ext = '';
+        try {
+          ext = new URL(bgUrl).pathname.split('.').pop().toLowerCase();
+        } catch(e) {
+          ext = bgUrl.split('.').pop().toLowerCase();
+        }
+
+        if (videoExtensions.includes(ext)) {
+          // 插入视频
+          bgContainer.innerHTML = `<video src="${bgUrl}" autoplay loop muted playsinline></video>`;
+        } else {
+          // 插入图片
+          bgContainer.style.backgroundImage = `url('${bgUrl}')`;
+        }
+      }
+    })();
+
     let currentPath = '';
     
     // 初始化主题
@@ -690,7 +718,7 @@
     
     function updateBreadcrumb(path) {
       const parts = path.split('/').filter(p => p);
-      let breadcrumbHtml = '<a onclick="loadImages(\'\')">R2 空间</a>';
+      let breadcrumbHtml = '<a onclick="loadImages(\'\')">云盘</a>';
       let accumulatedPath = '';
       
       parts.forEach((part) => {
