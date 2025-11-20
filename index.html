@@ -6,25 +6,39 @@
   <title>R2 图床管理系统</title>
   <style>
     :root {
+      /* Apple Design System Colors */
+      --background-base: #f5f5f7;
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --card-bg-solid: #ffffff;
+      
+      --primary-color: #0071e3; /* Apple Blue */
+      --primary-hover: #0077ed;
+      --success-color: #34c759; /* Apple Green */
+      --danger-color: #ff3b30;  /* Apple Red */
+      
+      --text-primary: #1d1d1f;
+      --text-secondary: #86868b;
+      --text-tertiary: #bfbfbf;
+      
+      --input-bg: #e8e8ed; /* Light gray input background */
+      
+      --border-radius-lg: 20px;
+      --border-radius-md: 14px;
+      --border-radius-sm: 10px;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+      
+      --glass-material: saturate(180%) blur(20px);
       --background-image: url('{{BACKGROUND_IMAGE}}');
-      --primary-color: #3b82f6;
-      --primary-hover: #2563eb;
-      --success-color: #10b981;
-      --danger-color: #ef4444;
-      --text-primary: #1f2937;
-      --text-secondary: #6b7280;
-      --border-radius: 16px;
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
     
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
     
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background-base);
       background-image: var(--background-image);
       background-size: cover;
       background-position: center;
@@ -32,20 +46,34 @@
       background-attachment: fixed;
       min-height: 100vh;
       color: var(--text-primary);
+      line-height: 1.5;
     }
     
+    /* 增加一层遮罩让文字在自定义背景上更清晰 */
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.1);  /* 轻微黑色遮罩 */
-      backdrop-filter: blur(5px);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(245, 245, 247, 0.65); /* 混合 Apple 背景色 */
+      backdrop-filter: blur(10px);
       z-index: -1;
     }
     
+    /* 通用按钮样式 (Apple Style) */
+    button {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+      font-weight: 500;
+    }
+    
+    button:active {
+      transform: scale(0.96);
+      opacity: 0.9;
+    }
+
     /* 登录页面 */
     #loginPage { 
       display: flex; 
@@ -56,260 +84,233 @@
     }
     
     .login-box { 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px); 
+      background: rgba(255, 255, 255, 0.85); 
+      backdrop-filter: var(--glass-material);
       padding: 48px 40px; 
-      border-radius: var(--border-radius); 
-      box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5);
+      border-radius: var(--border-radius-lg); 
+      box-shadow: var(--shadow-lg);
       width: 100%;
-      max-width: 400px;
-      animation: fadeInUp 0.6s ease;
+      max-width: 380px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(20px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     
     .login-box h1 { 
       margin-bottom: 32px; 
       color: var(--text-primary); 
-      font-size: 28px; 
-      text-align: center;
-      font-weight: 700;
+      font-size: 26px; 
+      font-weight: 600;
+      letter-spacing: -0.5px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
     }
     
     .login-box input { 
       width: 100%; 
-      padding: 14px 16px; 
-      border: 2px solid rgba(0, 0, 0, 0.1); 
-      border-radius: 12px; 
-      margin-bottom: 16px; 
-      font-size: 15px; 
-      background: rgba(255, 255, 255, 0.8);
+      padding: 16px; 
+      border: none; /* Remove border for iOS look */
+      border-radius: var(--border-radius-md); 
+      margin-bottom: 20px; 
+      font-size: 16px; 
+      background: var(--input-bg);
+      color: var(--text-primary);
       transition: all 0.3s ease;
-      outline: none;
     }
     
     .login-box input:focus {
-      border-color: var(--primary-color);
-      background: rgba(255, 255, 255, 1);
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); /* Apple Blue Glow */
+      outline: none;
     }
     
     .login-box button { 
       width: 100%; 
-      padding: 14px; 
+      padding: 16px; 
       background: var(--primary-color); 
       color: white; 
-      border: none; 
-      border-radius: 12px; 
-      cursor: pointer; 
-      font-size: 15px; 
+      border-radius: var(--border-radius-md); 
+      font-size: 16px; 
       font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-md);
     }
     
     .login-box button:hover { 
       background: var(--primary-hover); 
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .login-box button:active {
-      transform: translateY(0);
     }
     
     .error-msg { 
       color: var(--danger-color); 
-      font-size: 13px; 
-      margin-top: -12px; 
-      margin-bottom: 16px; 
-      padding: 8px 12px;
-      background: rgba(239, 68, 68, 0.1);
-      border-radius: 8px;
+      font-size: 14px; 
+      margin-top: -10px; 
+      margin-bottom: 20px; 
+      text-align: left;
+      padding-left: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     
     /* 主页面 */
-    #mainPage { display: none; animation: fadeIn 0.6s ease; }
+    #mainPage { display: none; animation: fadeIn 0.5s ease; }
     
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
     
+    /* 顶部导航栏 - iOS 风格 */
     .header { 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px); 
-      padding: 24px 40px; 
-      box-shadow: var(--shadow-md);
+      background: rgba(255, 255, 255, 0.75); 
+      backdrop-filter: var(--glass-material);
+      padding: 16px 32px; 
+      box-shadow: 0 1px 0 rgba(0,0,0,0.05);
       display: flex; 
       justify-content: space-between; 
       align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
       position: sticky;
       top: 0;
       z-index: 100;
+      height: 70px;
     }
     
     .header h1 { 
-      font-size: 22px; 
+      font-size: 20px; 
       color: var(--text-primary);
-      font-weight: 700;
+      font-weight: 600;
+      letter-spacing: -0.3px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
     
     .logout-btn { 
-      padding: 10px 20px; 
-      background: rgba(0, 0, 0, 0.05); 
-      border: none; 
-      border-radius: 10px; 
-      cursor: pointer;
+      padding: 8px 16px; 
+      background: rgba(0, 0, 0, 0.04); 
+      border-radius: 20px; 
+      color: var(--primary-color);
       font-size: 14px;
-      font-weight: 500;
-      color: var(--text-primary);
-      transition: all 0.3s ease;
     }
     
     .logout-btn:hover { 
-      background: rgba(0, 0, 0, 0.1);
-      transform: translateY(-1px);
+      background: rgba(0, 113, 227, 0.1);
     }
     
     .container { 
-      max-width: 1600px; 
+      max-width: 1440px; 
       margin: 0 auto; 
-      padding: 40px 40px 80px;
+      padding: 32px;
     }
     
+    /* 面包屑导航 */
     .breadcrumb { 
       margin-bottom: 24px; 
       font-size: 14px; 
       color: var(--text-secondary); 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px);
-      padding: 16px 20px; 
-      border-radius: 12px;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      padding-left: 4px;
     }
     
     .breadcrumb a { 
-      color: var(--primary-color); 
+      color: var(--text-secondary); 
       text-decoration: none; 
       cursor: pointer;
-      font-weight: 500;
-      transition: color 0.2s ease;
+      transition: color 0.2s;
+      padding: 4px 6px;
+      border-radius: 6px;
     }
     
     .breadcrumb a:hover { 
-      color: var(--primary-hover);
-      text-decoration: underline;
+      color: var(--primary-color);
+      background: rgba(0,0,0,0.03);
     }
     
+    .breadcrumb a:last-child {
+      color: var(--text-primary);
+      font-weight: 600;
+      pointer-events: none;
+    }
+    
+    /* 工具栏 */
     .toolbar { 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px); 
-      padding: 24px; 
-      border-radius: var(--border-radius); 
+      background: var(--card-bg-solid); 
+      padding: 20px; 
+      border-radius: var(--border-radius-lg); 
       margin-bottom: 32px; 
       display: flex; 
       gap: 16px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: var(--shadow-sm);
       align-items: center;
     }
     
     .toolbar input[type="file"] { 
       flex: 1; 
-      padding: 12px 16px; 
-      border: 2px dashed rgba(0, 0, 0, 0.2); 
-      border-radius: 12px;
+      padding: 12px 20px; 
+      border: 1px dashed #d1d1d6;
+      border-radius: var(--border-radius-md);
       font-size: 14px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      background: rgba(255, 255, 255, 0.5);
+      background: #f9f9f9;
+      color: var(--text-secondary);
     }
     
     .toolbar input[type="file"]:hover {
       border-color: var(--primary-color);
-      background: rgba(255, 255, 255, 0.8);
+      background: #fff;
     }
     
     .toolbar button { 
-      padding: 12px 28px; 
+      padding: 14px 28px; 
       background: var(--primary-color); 
       color: white; 
-      border: none; 
-      border-radius: 12px; 
-      cursor: pointer; 
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-sm);
-      white-space: nowrap;
+      border-radius: var(--border-radius-md); 
+      font-size: 15px; 
+      box-shadow: 0 2px 10px rgba(0, 113, 227, 0.3);
     }
     
     .toolbar button:hover { 
       background: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 4px 15px rgba(0, 113, 227, 0.4);
     }
     
     /* 文件夹网格 */
     .folders { 
       display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-      gap: 20px; 
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+      gap: 24px; 
       margin-bottom: 40px;
     }
     
     .folder-item { 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px); 
-      padding: 28px 20px; 
-      border-radius: var(--border-radius); 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       cursor: pointer; 
       text-align: center; 
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .folder-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-color), #8b5cf6);
-      transform: scaleX(0);
-      transition: transform 0.3s ease;
+      transition: all 0.2s ease;
+      padding: 10px;
+      border-radius: var(--border-radius-md);
     }
     
     .folder-item:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .folder-item:hover::before {
-      transform: scaleX(1);
+      background: rgba(255,255,255, 0.5);
+      box-shadow: var(--shadow-sm);
     }
     
     .folder-icon { 
-      font-size: 56px; 
-      margin-bottom: 12px;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      font-size: 64px; 
+      margin-bottom: 8px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      transition: transform 0.2s;
+    }
+
+    .folder-item:hover .folder-icon {
+      transform: scale(1.05);
     }
     
     .folder-name { 
@@ -317,153 +318,130 @@
       color: var(--text-primary); 
       word-break: break-all;
       font-weight: 500;
-      line-height: 1.5;
     }
     
-    /* 图片画廊 */
+    /* 图片画廊 - Apple Photos 风格 */
     .gallery { 
       display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
       gap: 24px;
     }
     
     .image-card { 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px); 
-      border-radius: var(--border-radius); 
+      background: var(--card-bg-solid);
+      border-radius: var(--border-radius-lg); 
       overflow: hidden; 
-      box-shadow: var(--shadow-md);
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.03);
     }
     
     .image-card:hover { 
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-xl);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
     }
     
     .image-card img { 
       width: 100%; 
-      height: 240px; 
+      height: 200px; 
       object-fit: cover; 
-      cursor: pointer;
-      transition: transform 0.4s ease;
+      cursor: zoom-in;
+      transition: transform 0.5s ease;
+      background: #f0f0f0; /* Placeholder color */
     }
     
+    /* 鼠标悬停时图片微放大 */
     .image-card:hover img {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
     
     .image-info { 
       padding: 16px;
+      background: #fff;
+      position: relative;
+      z-index: 1;
     }
     
-.image-name {
-  font-size: 14px;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-  word-break: break-word;
-  font-weight: 500;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  /* Add the following line for future compatibility */
-  line-clamp: 2;
-}
+    .image-name {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   
     .image-actions { 
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
       gap: 8px;
     }
     
     .image-actions button { 
-      padding: 8px 12px; 
-      border: none; 
+      flex: 1;
+      padding: 8px 0; 
       border-radius: 8px; 
-      cursor: pointer; 
       font-size: 12px; 
       font-weight: 600;
-      transition: all 0.3s ease;
-      white-space: nowrap;
     }
     
     .btn-copy { 
-      background: var(--success-color); 
-      color: white;
+      background: rgba(52, 199, 89, 0.1); 
+      color: #248a3d;
     }
     
     .btn-copy:hover { 
-      background: #059669;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
+      background: rgba(52, 199, 89, 0.2); 
     }
     
     .btn-download { 
-      background: var(--primary-color); 
-      color: white;
+      background: rgba(0, 113, 227, 0.1); 
+      color: var(--primary-color);
     }
     
     .btn-download:hover { 
-      background: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
+      background: rgba(0, 113, 227, 0.2);
     }
     
     .btn-delete { 
-      background: var(--danger-color); 
-      color: white;
+      background: rgba(255, 59, 48, 0.1); 
+      color: var(--danger-color);
     }
     
     .btn-delete:hover { 
-      background: #dc2626;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
+      background: rgba(255, 59, 48, 0.2);
     }
     
-    .empty { 
+    /* 状态提示 */
+    .empty, .loading { 
       text-align: center; 
-      padding: 80px 40px; 
+      padding: 80px 20px; 
       color: var(--text-secondary); 
-      font-size: 15px; 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.6); 
+      border-radius: var(--border-radius-lg);
+      backdrop-filter: blur(10px);
     }
     
     .empty-icon {
-      font-size: 64px;
+      font-size: 48px;
       margin-bottom: 16px;
-      opacity: 0.5;
+      opacity: 0.3;
+      filter: grayscale(100%);
     }
     
-    .loading { 
-      text-align: center; 
-      padding: 60px 40px; 
-      color: var(--text-secondary); 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-    
+    /* Loading Spinner - iOS style */
     .loading::after {
       content: '';
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      border: 3px solid rgba(59, 130, 246, 0.2);
-      border-top-color: var(--primary-color);
+      display: block;
+      width: 30px;
+      height: 30px;
+      margin: 20px auto 0;
+      border: 3px solid #e5e5e5;
+      border-top-color: var(--text-secondary);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-left: 12px;
-      vertical-align: middle;
+      animation: spin 0.8s ease infinite;
     }
     
     @keyframes spin {
@@ -471,27 +449,28 @@
     }
     
     .debug-info { 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(20px);
-      padding: 16px 20px; 
-      border-radius: 12px; 
+      background: #fff;
+      padding: 12px 20px; 
+      border-radius: var(--border-radius-md); 
       margin-bottom: 24px; 
-      font-size: 13px; 
+      font-size: 12px; 
       color: var(--text-secondary);
-      border: 1px solid rgba(59, 130, 246, 0.2);
       box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--primary-color);
+      font-family: "SF Mono", "Menlo", monospace;
     }
     
-    /* 响应式设计 */
+    /* 移动端响应式 */
     @media (max-width: 768px) {
-      .container { padding: 24px 20px 60px; }
-      .header { padding: 20px 24px; }
-      .header h1 { font-size: 18px; }
-      .toolbar { flex-direction: column; }
+      .container { padding: 20px 16px 80px; }
+      .header { padding: 16px 20px; }
+      .toolbar { flex-direction: column; padding: 16px; }
       .toolbar input[type="file"], .toolbar button { width: 100%; }
-      .gallery { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
-      .image-card img { height: 180px; }
-      .folders { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .gallery { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .image-card img { height: 140px; }
+      .image-actions { flex-direction: column; }
+      .folders { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .folder-icon { font-size: 48px; }
     }
   </style>
 </head>
@@ -499,22 +478,22 @@
   <div id="loginPage">
     <div class="login-box">
       <h1>
-        <span>🔐</span>
+        <span>☁️</span>
         <span>图床登录</span>
       </h1>
-      <input type="password" id="passwordInput" placeholder="请输入密码" onkeypress="if(event.key==='Enter')login()" />
+      <input type="password" id="passwordInput" placeholder="请输入访问密码" onkeypress="if(event.key==='Enter')login()" />
       <div class="error-msg" id="loginError" style="display: none;"></div>
-      <button onclick="login()">登录进入</button>
+      <button onclick="login()">进入系统</button>
     </div>
   </div>
 
   <div id="mainPage">
     <div class="header">
       <h1>
-        <span>📷</span>
-        <span>R2 图床管理</span>
+        <span>☁️</span>
+        <span>R2 图床</span>
       </h1>
-      <button class="logout-btn" onclick="logout()">退出登录</button>
+      <button class="logout-btn" onclick="logout()">退出</button>
     </div>
     
     <div class="container">
@@ -524,7 +503,7 @@
       
       <div class="toolbar">
         <input type="file" id="fileInput" accept="image/*" multiple />
-        <button onclick="uploadFiles()">📤 上传图片</button>
+        <button onclick="uploadFiles()">上传照片</button>
       </div>
       
       <div id="foldersContainer"></div>
@@ -549,7 +528,7 @@
       const errorEl = document.getElementById('loginError');
       
       if (!password) {
-        errorEl.textContent = '请输入密码';
+        errorEl.textContent = '⚠️ 请输入密码';
         errorEl.style.display = 'block';
         return;
       }
@@ -562,12 +541,12 @@
         if (response.ok) {
           checkAuth();
         } else {
-          errorEl.textContent = '密码错误，请重试';
+          errorEl.textContent = '⚠️ 密码错误，请重试';
           errorEl.style.display = 'block';
           document.cookie = 'auth_token=; path=/; max-age=0';
         }
       } catch (error) {
-        errorEl.textContent = '登录失败: ' + error.message;
+        errorEl.textContent = '⚠️ 登录失败: ' + error.message;
         errorEl.style.display = 'block';
       }
     }
@@ -579,7 +558,7 @@
     
     async function loadImages(path = '') {
       currentPath = path;
-      document.getElementById('galleryContainer').innerHTML = '<div class="loading">加载中</div>';
+      document.getElementById('galleryContainer').innerHTML = '<div class="loading">正在载入内容...</div>';
       document.getElementById('foldersContainer').innerHTML = '';
       
       try {
@@ -596,9 +575,9 @@
         const debugInfo = document.getElementById('debugInfo');
         debugInfo.style.display = 'block';
         debugInfo.innerHTML = `
-          📂 当前路径: ${path || '根目录'} &nbsp;|&nbsp; 
-          📁 文件夹: ${data.folders?.length || 0} &nbsp;|&nbsp; 
-          🖼️ 图片: ${data.files?.length || 0}
+          📍 当前路径: /${path} <br>
+          📂 文件夹: ${data.folders?.length || 0} 个 &nbsp;|&nbsp; 
+          🖼️ 图片: ${data.files?.length || 0} 张
         `;
         
         updateBreadcrumb(path);
@@ -634,9 +613,9 @@
         } else if (!data.folders || data.folders.length === 0) {
           document.getElementById('galleryContainer').innerHTML = `
             <div class="empty">
-              <div class="empty-icon">📭</div>
-              <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">暂无图片</div>
-              <div style="font-size: 13px; opacity: 0.7;">请上传图片或检查R2存储桶配置</div>
+              <div class="empty-icon">☁️</div>
+              <div style="font-size: 17px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary);">此处没有图片</div>
+              <div style="font-size: 14px;">您可以点击上方按钮上传新照片</div>
             </div>
           `;
         } else {
@@ -646,14 +625,11 @@
         console.error('Load error:', error);
         document.getElementById('galleryContainer').innerHTML = `
           <div class="empty">
-            <div class="empty-icon">⚠️</div>
-            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px; color: var(--danger-color);">加载失败</div>
-            <div style="font-size: 13px; margin-bottom: 12px;">${error.message}</div>
-            <div style="font-size: 12px; opacity: 0.7; line-height: 1.6;">
-              请检查：<br>
-              • R2 bucket binding 是否已配置<br>
-              • R2_CUSTOM_DOMAIN 环境变量是否正确<br>
-              • R2 存储桶中是否有文件
+            <div class="empty-icon" style="color: var(--danger-color); opacity: 1;">⚠️</div>
+            <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">无法加载内容</div>
+            <div style="font-size: 14px; margin-bottom: 12px;">${error.message}</div>
+            <div style="font-size: 12px; opacity: 0.7; max-width: 300px; margin: 0 auto; line-height: 1.5;">
+              请检查 R2 存储桶配置、域名绑定及网络连接状态。
             </div>
           </div>
         `;
@@ -662,7 +638,7 @@
     
     function updateBreadcrumb(path) {
       const parts = path.split('/').filter(p => p);
-      let breadcrumbHtml = '<a onclick="loadImages(\'\')">🏠 首页</a>';
+      let breadcrumbHtml = '<a onclick="loadImages(\'\')">R2 存储</a>';
       let accumulatedPath = '';
       
       parts.forEach((part) => {
@@ -676,12 +652,18 @@
     async function uploadFiles() {
       const files = document.getElementById('fileInput').files;
       if (files.length === 0) {
-        alert('请先选择文件');
+        alert('请先选择要上传的图片');
         return;
       }
       
       let successCount = 0;
       let failCount = 0;
+      
+      // 简单的上传 loading 状态
+      const btn = document.querySelector('.toolbar button');
+      const originalText = btn.innerText;
+      btn.innerText = '正在上传...';
+      btn.disabled = true;
       
       for (const file of files) {
         const formData = new FormData();
@@ -706,17 +688,22 @@
       }
       
       document.getElementById('fileInput').value = '';
+      btn.innerText = originalText;
+      btn.disabled = false;
       
       if (successCount > 0) {
-        alert(`✅ 成功上传 ${successCount} 个文件${failCount > 0 ? `，${failCount} 个失败` : ''}`);
+        // 使用原生 alert 保持一致，也可以改用自定义 toast
         loadImages(currentPath);
+        setTimeout(() => {
+           alert(`✅ 完成：成功 ${successCount} 个${failCount > 0 ? `，失败 ${failCount} 个` : ''}`);
+        }, 100);
       } else {
-        alert('❌ 上传失败');
+        alert('❌ 上传失败，请重试');
       }
     }
     
     async function deleteImage(key) {
-      if (!confirm('确定要删除这张图片吗？\n删除后无法恢复！')) return;
+      if (!confirm('确定要将这张图片放入废纸篓吗？此操作无法撤销。')) return;
       
       try {
         const response = await fetch('/api/delete', {
@@ -727,7 +714,6 @@
         
         const result = await response.json();
         if (result.success) {
-          alert('✅ 删除成功');
           loadImages(currentPath);
         } else {
           alert(`❌ 删除失败: ${result.error}`);
@@ -739,7 +725,22 @@
     
     function copyUrl(url) {
       navigator.clipboard.writeText(url).then(() => {
-        alert('✅ 链接已复制到剪贴板');
+        // 创建一个临时的 toast 提示
+        const toast = document.createElement('div');
+        toast.style.position = 'fixed';
+        toast.style.bottom = '40px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = 'rgba(0,0,0,0.8)';
+        toast.style.color = 'white';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '20px';
+        toast.style.zIndex = '1000';
+        toast.style.fontSize = '14px';
+        toast.style.backdropFilter = 'blur(10px)';
+        toast.textContent = '🔗 链接已复制';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
       }).catch(err => {
         alert('❌ 复制失败: ' + err.message);
       });
@@ -749,4 +750,3 @@
   </script>
 </body>
 </html>
-
