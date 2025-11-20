@@ -13,9 +13,17 @@ export async function onRequestPost(context) {
       });
     }
     
-    // 生成文件路径
     const fileName = file.name;
-    const key = path ? `${path}/${fileName}` : fileName;
+    
+    // 修复：确保路径拼接正确
+    let key;
+    if (path && path !== '') {
+      // 如果 path 已经以 / 结尾，就不再添加 /
+      key = path.endsWith('/') ? `${path}${fileName}` : `${path}/${fileName}`;
+    } else {
+      // 根目录直接使用文件名
+      key = fileName;
+    }
     
     // 上传到R2
     await env.MY_BUCKET.put(key, file.stream(), {
