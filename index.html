@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>R2 空间云盘</title>
+  <title>R2 空间</title>
   <style>
     :root {
       /* 物理动效曲线 */
@@ -516,7 +516,7 @@
       </h1>
       <input type="password" id="passwordInput" placeholder="请输入访问密码" onkeypress="if(event.key==='Enter')login()" />
       <div class="error-msg" id="loginError" style="display: none;"></div>
-      <button onclick="login()">解锁云盘</button>
+      <button onclick="login()">登录</button>
     </div>
   </div>
 
@@ -525,7 +525,7 @@
     <div class="header">
       <h1>
         <img src="https://image.hyeri.us.kg/icon.png" class="app-logo" style="width: 32px; height: 32px;" alt="Logo">
-        <span>R2 空间云盘</span>
+        <span>R2 空间</span>
       </h1>
       <div class="header-controls">
         <button class="icon-btn" onclick="toggleTheme()" title="切换主题" id="themeBtn">☀️</button>
@@ -718,7 +718,7 @@
     
     function updateBreadcrumb(path) {
       const parts = path.split('/').filter(p => p);
-      let breadcrumbHtml = '<a onclick="loadImages(\'\')">云盘</a>';
+      let breadcrumbHtml = '<a onclick="loadImages(\'\')">R2 空间</a>';
       let accumulatedPath = '';
       
       parts.forEach((part) => {
@@ -822,3 +822,4 @@
   </script>
 </body>
 </html>
+
