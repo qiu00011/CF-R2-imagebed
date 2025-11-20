@@ -1,11 +1,11 @@
-name = "image-bed"
+name = "r2-image-bed"
 compatibility_date = "2024-01-01"
 
 [[r2_buckets]]
 binding = "MY_BUCKET"
-bucket_name = "hyeriphotos"
+bucket_name = "your-bucket-name"
 
 [vars]
-R2_CUSTOM_DOMAIN = "https://hyeriphotos.hyeri.us.kg"
-PASSWORD = "056450"
-BACKGROUND_IMAGE = "https://images.yourdomain.com/background.jpg"
+R2_CUSTOM_DOMAIN = "https://images.yourdomain.com"
+PASSWORD = "your-secret-password"
+BACKGROUND_URL = "https://images.yourdomain.com/background.jpg"  # 可以是图片或视频
