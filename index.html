@@ -189,7 +189,7 @@
   <script>
     // 页面加载完成后再执行背景加载，确保 #bg-layer 存在
     document.addEventListener('DOMContentLoaded', function() {
-      const bgUrl = '{{BACKGROUND_IMAGE}}'; // 你的 Worker 会替换这个变量
+      const bgUrl = '{{BACKGROUND_URL}}'; // 你的 Worker 会替换这个变量
       const bgContainer = document.getElementById('bg-layer');
       
       // 调试信息，帮助你确认 Worker 是否成功替换了变量
@@ -397,3 +397,4 @@
   </script>
 </body>
 </html>
+
