@@ -33,7 +33,7 @@
       --input-bg: rgba(255,255,255,0.5);
       --input-focus-bg: #ffffff;
       
-      --bg-overlay: rgba(255,255,255,0); /* 背景遮罩透明度 */
+      --bg-overlay: rgba(255,255,255,0);
     }
 
     /* 暗黑模式 (Dark Mode) 覆盖变量 */
@@ -46,7 +46,7 @@
       --glass-border: rgba(255, 255, 255, 0.1);
       --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       --card-bg: #1c1c1e;
-      --card-hover-shadow: 0 0 30px rgba(0, 122, 255, 0.15); /* 暗黑模式下的微光 */
+      --card-hover-shadow: 0 0 30px rgba(0, 122, 255, 0.15);
       
       --text-primary: #f5f5f7;
       --text-secondary: rgba(255, 255, 255, 0.5);
@@ -55,7 +55,7 @@
       --input-bg: rgba(255,255,255,0.1);
       --input-focus-bg: rgba(255,255,255,0.15);
       
-      --bg-overlay: rgba(0,0,0,0.5); /* 自定义背景在暗黑模式下变暗 */
+      --bg-overlay: rgba(0,0,0,0.5);
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -63,7 +63,7 @@
     body { 
       font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
       background-color: var(--bg-base);
-      background-image: var(--bg-gradient); /* 默认极光 */
+      background-image: var(--bg-gradient);
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
@@ -73,7 +73,6 @@
       position: relative;
     }
 
-    /* 处理自定义背景图 */
     body::before {
       content: '';
       position: fixed;
@@ -83,10 +82,8 @@
       background-position: center;
       background-attachment: fixed;
       z-index: -2;
-      /* 如果 URL 无效，这里不会显示，回退到 body 的 gradient */
     }
     
-    /* 背景遮罩层（用于暗黑模式压暗自定义背景） */
     body::after {
       content: '';
       position: fixed;
@@ -95,7 +92,7 @@
       z-index: -1;
       pointer-events: none;
       transition: background 0.5s;
-      backdrop-filter: blur(0px); /* 可选：是否给背景加一点模糊 */
+      backdrop-filter: blur(0px);
     }
 
     @keyframes ambientLight {
@@ -103,7 +100,6 @@
       100% { background-position: 100% 100%; }
     }
     
-    /* 通用按钮：悬浮胶囊 */
     button {
       border: none;
       cursor: pointer;
@@ -115,7 +111,15 @@
     
     button:active { transform: scale(0.94); }
 
-    /* 登录页：悬浮晶体 */
+    /* LOGO 样式 */
+    .app-logo {
+      border-radius: 12px; /* iOS App Icon 圆角 */
+      object-fit: cover;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      vertical-align: middle;
+    }
+
+    /* 登录页 */
     #loginPage { 
       display: flex; 
       align-items: center; 
@@ -131,12 +135,10 @@
       padding: 60px 50px; 
       border-radius: 40px; 
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       text-align: center;
       border: 1px solid var(--glass-border);
-      box-shadow: 
-        var(--glass-shadow),
-        inset 0 0 0 1px rgba(255,255,255,0.1); 
+      box-shadow: var(--glass-shadow), inset 0 0 0 1px rgba(255,255,255,0.1); 
       animation: floatIn 1s var(--ease-spatial);
     }
     
@@ -151,6 +153,10 @@
       margin-bottom: 40px;
       color: var(--text-primary);
       letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px; /* Logo 和文字的间距 */
     }
     
     .login-box input { 
@@ -178,7 +184,7 @@
       width: 100%; 
       padding: 20px; 
       background: var(--text-primary); 
-      color: var(--bg-base); /* 反色 */
+      color: var(--bg-base);
       border-radius: 20px; 
       font-size: 18px; 
       font-weight: 600;
@@ -201,7 +207,7 @@
     #mainPage { display: none; padding-bottom: 100px; animation: fadeIn 0.6s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     
-    /* Header：悬浮动态岛设计 */
+    /* Header */
     .header { 
       position: fixed;
       top: 20px;
@@ -213,7 +219,7 @@
       background: var(--glass-surface);
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
-      border-radius: 100px; /* 胶囊形状 */
+      border-radius: 100px;
       display: flex; 
       justify-content: space-between; 
       align-items: center;
@@ -233,7 +239,7 @@
       font-size: 18px; 
       font-weight: 700;
       letter-spacing: -0.5px;
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 12px;
       color: var(--text-primary);
     }
 
@@ -264,7 +270,6 @@
       padding: 0 40px;
     }
     
-    /* 面包屑：极简文字 */
     .breadcrumb { 
       margin-bottom: 30px; 
       font-size: 24px; 
@@ -284,7 +289,6 @@
     .breadcrumb a:hover { color: var(--text-primary); }
     .breadcrumb a:last-child { color: var(--text-primary); font-weight: 800; pointer-events: none;}
     
-    /* 工具栏 */
     .toolbar { 
       background: transparent;
       margin-bottom: 40px; 
@@ -332,7 +336,6 @@
       transform: translateY(-3px);
     }
     
-    /* 文件夹 */
     .folders { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
@@ -370,7 +373,6 @@
       font-weight: 600;
     }
     
-    /* 图片：沉浸式卡片 */
     .gallery { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -384,7 +386,7 @@
       box-shadow: var(--glass-shadow);
       transition: all 0.5s var(--ease-spatial);
       position: relative;
-      padding: 10px; /* 相框感 */
+      padding: 10px;
       border: 1px solid transparent;
     }
 
@@ -423,7 +425,6 @@
       letter-spacing: -0.01em;
     }
   
-    /* 操作按钮：悬浮药丸 */
     .image-actions { 
       display: flex;
       gap: 8px;
@@ -448,11 +449,8 @@
       transform: scale(1.05);
     }
     
-    .image-actions .btn-delete:hover {
-      color: #ff3b30;
-    }
+    .image-actions .btn-delete:hover { color: #ff3b30; }
     
-    /* 状态展示 */
     .empty, .loading { 
       text-align: center; 
       padding: 100px 0; 
@@ -494,7 +492,6 @@
       border: 1px solid var(--glass-border);
     }
     
-    /* 移动端适配 */
     @media (max-width: 768px) {
       .header { width: 90%; top: 15px; height: 60px; padding: 0 15px; }
       .container { padding: 0 20px; margin-top: 100px; }
@@ -510,10 +507,14 @@
   <!-- 登录界面 -->
   <div id="loginPage">
     <div class="login-box">
-      <h1>身份验证</h1>
+      <h1>
+        <!-- 登录页 Logo -->
+        <img src="https://image.hyeri.us.kg/icon.png" class="app-logo" style="width: 50px; height: 50px;" alt="Logo">
+        <span>身份验证</span>
+      </h1>
       <input type="password" id="passwordInput" placeholder="请输入访问密码" onkeypress="if(event.key==='Enter')login()" />
       <div class="error-msg" id="loginError" style="display: none;"></div>
-      <button onclick="login()">解锁云盘</button>
+      <button onclick="login()">登录</button>
     </div>
   </div>
 
@@ -521,7 +522,8 @@
   <div id="mainPage">
     <div class="header">
       <h1>
-        <span>☁️</span>
+        <!-- 顶部栏 Logo -->
+        <img src="https://image.hyeri.us.kg/icon.png" class="app-logo" style="width: 32px; height: 32px;" alt="Logo">
         <span>R2 空间云盘</span>
       </h1>
       <div class="header-controls">
@@ -571,7 +573,6 @@
       }
     }
 
-    // 页面加载时初始化
     initTheme();
     
     function checkAuth() {
@@ -773,7 +774,6 @@
     
     function copyUrl(url) {
       navigator.clipboard.writeText(url).then(() => {
-        // 悬浮 Toast 提示
         const toast = document.createElement('div');
         toast.innerText = '链接已复制';
         toast.style.cssText = `
