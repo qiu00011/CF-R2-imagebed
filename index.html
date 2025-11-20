@@ -3,395 +3,459 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>R2 图床</title>
+  <title>R2 Spatial Drive</title>
   <style>
     :root {
-      /* Apple Color System */
-      --bg-body: #F5F5F7;
-      --bg-card: #FFFFFF;
-      --bg-input: #E5E5EA; /* iOS Search bar gray */
+      /* iOS 26 Design Tokens */
+      --glass-surface: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.5);
+      --glass-highlight: rgba(255, 255, 255, 0.8);
+      --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
       
-      --primary: #0071E3; /* Apple Blue */
-      --primary-hover: #0077ED;
-      --danger: #FF3B30;  /* Apple Red */
-      --success: #34C759; /* Apple Green */
+      --primary-gradient: linear-gradient(135deg, #007AFF, #0055FF);
+      --text-primary: #111111;
+      --text-secondary: rgba(0, 0, 0, 0.5);
       
-      --text-primary: #1D1D1F;
-      --text-secondary: #86868B;
-      --text-tertiary: #BFBFBF;
+      --radius-surface: 32px; /* 极度圆润 */
+      --radius-element: 20px;
       
-      --radius-lg: 18px; /* iOS App Icon curvature-like */
-      --radius-md: 12px;
-      
-      /* Apple-style smooth shadows */
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
-      
-      /* Animations */
-      --ease-apple: cubic-bezier(0.25, 1, 0.5, 1);
+      /* Physics */
+      --ease-spatial: cubic-bezier(0.32, 0.72, 0, 1); /* 空间物理曲线 */
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
     
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
-      background-color: var(--bg-body);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f2f2f6;
       color: var(--text-primary);
-      line-height: 1.4;
       min-height: 100vh;
-    }
-    
-    /* 按钮基础样式 */
-    button {
-      font-family: inherit;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s var(--ease-apple);
-      font-weight: 500;
-      font-size: 14px;
-    }
-    
-    button:active {
-      transform: scale(0.96);
-      opacity: 0.8;
+      overflow-x: hidden;
+      
+      /* 动态呼吸背景：模拟未来的环境光 */
+      background-image: 
+        radial-gradient(circle at 0% 0%, rgba(0, 122, 255, 0.15), transparent 40%),
+        radial-gradient(circle at 100% 0%, rgba(255, 45, 85, 0.1), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(88, 86, 214, 0.15), transparent 40%),
+        radial-gradient(circle at 0% 100%, rgba(52, 199, 89, 0.1), transparent 40%);
+      background-size: 140% 140%;
+      animation: ambientLight 15s ease-in-out infinite alternate;
     }
 
-    /* 登录页 - 极简居中 */
+    @keyframes ambientLight {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+    
+    /* 通用按钮：悬浮胶囊 */
+    button {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.4s var(--ease-spatial);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button:active { transform: scale(0.92); }
+
+    /* 登录页：悬浮晶体 */
     #loginPage { 
       display: flex; 
       align-items: center; 
       justify-content: center; 
       min-height: 100vh; 
-      padding: 20px;
-      background: #fff; /* 纯白背景显高级 */
+      perspective: 1000px;
     }
     
     .login-box { 
+      background: var(--glass-surface);
+      backdrop-filter: blur(50px) saturate(180%);
+      -webkit-backdrop-filter: blur(50px) saturate(180%);
+      padding: 60px 50px; 
+      border-radius: 40px; 
       width: 100%;
-      max-width: 360px;
+      max-width: 400px;
       text-align: center;
-      animation: fadeUp 0.6s var(--ease-apple);
+      border: 1px solid var(--glass-border);
+      box-shadow: 
+        0 40px 80px rgba(0,0,0,0.1),
+        inset 0 0 0 1px rgba(255,255,255,0.5); /* 内发光模拟厚度 */
+      animation: floatIn 1s var(--ease-spatial);
     }
     
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(60px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     
     .login-box h1 { 
-      font-size: 24px; 
-      font-weight: 600;
-      margin-bottom: 32px;
-      letter-spacing: -0.02em;
-      color: #000;
+      font-size: 32px; 
+      font-weight: 800;
+      margin-bottom: 40px;
+      background: linear-gradient(180deg, #000 0%, #555 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.03em;
     }
     
     .login-box input { 
       width: 100%; 
-      padding: 16px; 
-      background: var(--bg-input);
+      padding: 20px; 
+      background: rgba(255,255,255,0.5);
       border: none;
-      border-radius: var(--radius-md); 
-      font-size: 17px; /* iOS 标准字号 */
+      border-radius: 20px; 
+      font-size: 18px; 
       color: var(--text-primary);
-      margin-bottom: 20px;
-      transition: background 0.2s;
-      outline: none;
+      margin-bottom: 24px;
       text-align: center;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+      transition: 0.3s;
+      outline: none;
     }
     
     .login-box input:focus {
-      background: #D1D1D6;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(0,122,255,0.15);
+      transform: scale(1.02);
     }
     
     .login-box button { 
       width: 100%; 
-      padding: 16px; 
-      background: var(--primary); 
+      padding: 20px; 
+      background: #000; 
       color: white; 
-      border-radius: var(--radius-md); 
-      font-size: 17px;
+      border-radius: 20px; 
+      font-size: 18px; 
       font-weight: 600;
     }
     
-    .login-box button:hover { background: var(--primary-hover); }
-    
-    .error-msg { 
-      color: var(--danger); 
-      font-size: 14px; 
-      margin-bottom: 20px; 
+    .login-box button:hover { 
+      background: #222; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
     }
     
-    /* 主界面 */
-    #mainPage { display: none; animation: fadeIn 0.4s ease; }
+    .error-msg { 
+      color: #ff3b30; 
+      font-size: 14px; 
+      margin-bottom: 20px; 
+      font-weight: 500;
+    }
+    
+    /* 主界面布局 */
+    #mainPage { display: none; padding-bottom: 100px; animation: fadeIn 0.6s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     
-    /* 顶部导航 - 磨砂质感 */
+    /* Header：悬浮动态岛设计 */
     .header { 
-      background: rgba(255, 255, 255, 0.72); 
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      padding: 0 40px; 
-      height: 60px;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 100px; /* 胶囊形状 */
       display: flex; 
       justify-content: space-between; 
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      padding: 0 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      z-index: 1000;
+      border: 1px solid rgba(255,255,255,0.6);
+      transition: 0.4s var(--ease-spatial);
+    }
+    
+    .header:hover {
+      width: 92%;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.12);
     }
     
     .header h1 { 
-      font-size: 19px; 
-      font-weight: 600;
-      color: #000;
-      letter-spacing: -0.01em;
+      font-size: 18px; 
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex; align-items: center; gap: 8px;
     }
     
     .logout-btn { 
-      color: var(--primary);
-      background: transparent;
-      font-size: 15px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      color: #000;
+      font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold;
     }
     
-    .logout-btn:hover { text-decoration: underline; }
+    .logout-btn:hover { background: #e0e0e0; }
     
     .container { 
-      max-width: 1200px; /* 收窄宽度以获得更精致的布局 */
-      margin: 0 auto; 
-      padding: 40px 40px 80px;
+      max-width: 1400px; 
+      margin: 120px auto 0; 
+      padding: 0 40px;
     }
     
-    /* 面包屑 - 灰色极简 */
+    /* 面包屑：极简文字 */
     .breadcrumb { 
-      margin-bottom: 24px; 
-      font-size: 13px; 
-      color: var(--text-secondary); 
+      margin-bottom: 30px; 
+      font-size: 24px; /* 大标题风格 */
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      padding-left: 10px;
     }
     
     .breadcrumb a { 
       color: var(--text-secondary); 
       text-decoration: none; 
-      transition: color 0.2s;
+      transition: 0.3s;
+      font-weight: 500;
     }
     
     .breadcrumb a:hover { color: var(--text-primary); }
-    .breadcrumb a:last-child { color: var(--text-primary); font-weight: 600; cursor: default; }
+    .breadcrumb a:last-child { color: var(--text-primary); font-weight: 800; pointer-events: none;}
     
-    /* 工具栏 - 白色卡片 */
+    /* 工具栏：控制中心风格 */
     .toolbar { 
-      background: var(--bg-card);
-      padding: 16px; 
-      border-radius: var(--radius-lg); 
+      background: transparent;
       margin-bottom: 40px; 
       display: flex; 
-      gap: 16px;
+      gap: 20px;
       align-items: center;
-      box-shadow: var(--shadow-sm);
     }
     
     .toolbar input[type="file"] { 
       flex: 1;
-      font-size: 14px;
+      padding: 15px 25px;
+      background: #fff;
+      border-radius: 20px;
+      border: none;
+      box-shadow: var(--glass-shadow);
       color: var(--text-secondary);
+      transition: 0.3s;
     }
+    
+    .toolbar input[type="file"]:hover { transform: scale(1.01); }
     
     .toolbar input[type="file"]::file-selector-button {
-      background: var(--bg-input);
+      background: #000;
+      color: #fff;
       border: none;
       padding: 8px 16px;
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-weight: 500;
-      margin-right: 12px;
+      border-radius: 12px;
+      margin-right: 15px;
       cursor: pointer;
-      transition: 0.2s;
-    }
-    
-    .toolbar input[type="file"]::file-selector-button:hover { background: #D1D1D6; }
-    
-    .toolbar button { 
-      padding: 10px 24px; 
-      background: var(--primary); 
-      color: white; 
-      border-radius: 99px; /* 圆角按钮 */
       font-weight: 600;
     }
     
-    .toolbar button:hover { background: var(--primary-hover); }
+    .toolbar button { 
+      padding: 15px 40px; 
+      background: var(--primary-gradient); 
+      color: white; 
+      border-radius: 20px; 
+      font-size: 16px; 
+      font-weight: 600;
+      box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+    }
     
-    /* 文件夹 - iOS 图标风格 */
+    .toolbar button:hover { 
+      box-shadow: 0 15px 30px rgba(0, 122, 255, 0.4);
+      transform: translateY(-3px);
+    }
+    
+    /* 文件夹：Bento Grid 风格 */
     .folders { 
       display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-      gap: 32px; 
-      margin-bottom: 48px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+      gap: 25px; 
+      margin-bottom: 50px;
     }
     
     .folder-item { 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(20px);
+      padding: 30px 20px; 
+      border-radius: 28px; 
       cursor: pointer; 
       text-align: center; 
-      transition: opacity 0.2s;
+      transition: all 0.4s var(--ease-spatial);
+      border: 1px solid rgba(255,255,255,0.4);
     }
     
-    .folder-item:hover { opacity: 0.7; }
+    .folder-item:hover {
+      background: #fff;
+      transform: scale(1.05);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+      z-index: 10;
+    }
     
     .folder-icon { 
-      font-size: 56px; 
+      font-size: 48px; 
       margin-bottom: 10px;
-      /* 使用纯色 Emoji */
-      color: #7EC0EE; 
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
     }
     
     .folder-name { 
-      font-size: 13px; 
+      font-size: 15px; 
       color: var(--text-primary); 
-      font-weight: 500;
-      width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      font-weight: 600;
     }
     
-    /* 图片网格 - 干净利落 */
+    /* 图片：沉浸式卡片 */
     .gallery { 
       display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+      gap: 30px;
     }
     
     .image-card { 
-      background: var(--bg-card);
-      border-radius: var(--radius-lg); 
+      background: #fff;
+      border-radius: 32px; 
       overflow: hidden; 
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.3s var(--ease-apple), box-shadow 0.3s var(--ease-apple);
+      box-shadow: var(--glass-shadow);
+      transition: all 0.5s var(--ease-spatial);
       position: relative;
-      border: 1px solid rgba(0,0,0,0.02); /* 极微弱的边框增加精致感 */
+      padding: 10px; /* 相框感 */
     }
     
     .image-card:hover { 
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 40px 70px rgba(0,0,0,0.12);
+      z-index: 5;
     }
     
     .image-card img { 
       width: 100%; 
-      height: 200px; 
+      height: 260px; 
       object-fit: cover; 
+      border-radius: 24px; /* 图片本身也有圆角 */
       cursor: zoom-in;
-      background: #fafafa;
+      transition: 0.5s;
     }
     
     .image-info { 
-      padding: 16px;
+      padding: 15px 10px 5px;
     }
     
     .image-name {
-      font-size: 14px;
+      font-size: 15px;
       color: var(--text-primary);
-      margin-bottom: 16px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
+      margin-bottom: 15px;
+      font-weight: 700;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      letter-spacing: -0.01em;
     }
   
+    /* 操作按钮：悬浮药丸 */
     .image-actions { 
       display: flex;
       gap: 8px;
+      background: #f5f5f7;
+      padding: 6px;
+      border-radius: 16px;
     }
     
     .image-actions button { 
       flex: 1;
-      padding: 8px 0; 
-      border-radius: 8px; 
+      padding: 10px 0; 
+      border-radius: 12px; 
       font-size: 12px; 
       font-weight: 600;
-      background: var(--bg-input); /* 灰色辅助按钮 */
+      background: transparent;
       color: var(--text-primary);
     }
     
-    .image-actions button:hover { background: #d1d1d6; }
-    
-    .image-actions .btn-delete { 
-      background: rgba(255, 59, 48, 0.1); 
-      color: var(--danger); 
+    .image-actions button:hover { 
+      background: #fff; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transform: scale(1.05);
     }
-    .image-actions .btn-delete:hover { background: rgba(255, 59, 48, 0.2); }
     
-    /* 状态与 Loading */
+    .image-actions .btn-delete:hover {
+      color: #ff3b30;
+      background: #fff;
+    }
+    
+    /* 状态展示 */
     .empty, .loading { 
       text-align: center; 
-      padding: 120px 0; 
-      color: var(--text-secondary); 
+      padding: 100px 0; 
+      color: var(--text-secondary);
+      font-weight: 500; 
     }
     
     .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      color: #D1D1D6;
+      font-size: 64px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #e0e0e0, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
     }
     
-    .loading { font-size: 14px; color: var(--text-secondary); }
-    
-    /* 简单的 Apple 风格加载圈 */
-    .loading::before {
+    .loading::after {
       content: '';
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 2px solid #E5E5EA;
-      border-top-color: var(--text-secondary);
+      display: block;
+      width: 30px;
+      height: 30px;
+      margin: 20px auto;
+      border: 3px solid rgba(0, 122, 255, 0.2);
+      border-top-color: #007AFF;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 10px;
-      vertical-align: middle;
+      animation: spin 0.8s var(--ease-spatial) infinite;
     }
+    
     @keyframes spin { to { transform: rotate(360deg); } }
     
     .debug-info { 
-      background: #fff; 
-      padding: 12px;
-      border-radius: 8px;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(10px);
+      padding: 10px 20px; 
+      border-radius: 12px; 
+      margin-bottom: 30px; 
       font-size: 12px; 
-      color: var(--text-secondary); 
-      margin-bottom: 24px;
-      border: 1px solid #eee;
-      font-family: "SF Mono", monospace;
+      color: var(--text-secondary);
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.2);
     }
     
-    /* 移动端 */
+    /* 移动端适配 */
     @media (max-width: 768px) {
-      .container { padding: 20px 20px 60px; }
-      .header { padding: 0 20px; }
-      .toolbar { flex-direction: column; padding: 20px; }
+      .header { width: 85%; top: 15px; height: 60px; padding: 0 20px; }
+      .container { padding: 0 20px; margin-top: 100px; }
+      .breadcrumb { font-size: 20px; }
+      .toolbar { flex-direction: column; gap: 15px; }
       .toolbar input[type="file"], .toolbar button { width: 100%; }
-      .gallery { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-      .image-card img { height: 140px; }
-      .image-info { padding: 12px; }
+      .gallery { grid-template-columns: 1fr; gap: 25px; }
+      .image-card img { height: 220px; }
     }
   </style>
 </head>
 <body>
   <div id="loginPage">
     <div class="login-box">
-      <h1>R2 管理台</h1>
-      <input type="password" id="passwordInput" placeholder="输入密码" onkeypress="if(event.key==='Enter')login()" />
+      <h1>Identity</h1>
+      <input type="password" id="passwordInput" placeholder="Passkey" onkeypress="if(event.key==='Enter')login()" />
       <div class="error-msg" id="loginError" style="display: none;"></div>
-      <button onclick="login()">登录</button>
+      <button onclick="login()">Unlock</button>
     </div>
   </div>
 
   <div id="mainPage">
     <div class="header">
-      <h1>图床</h1>
-      <button class="logout-btn" onclick="logout()">退出</button>
+      <h1>
+        <span>☁️</span>
+        <span>R2 Cloud</span>
+      </h1>
+      <button class="logout-btn" onclick="logout()" title="Logout">✕</button>
     </div>
     
     <div class="container">
@@ -401,7 +465,7 @@
       
       <div class="toolbar">
         <input type="file" id="fileInput" accept="image/*" multiple />
-        <button onclick="uploadFiles()">上传照片</button>
+        <button onclick="uploadFiles()">Upload Assets</button>
       </div>
       
       <div id="foldersContainer"></div>
@@ -410,7 +474,6 @@
   </div>
 
   <script>
-    // 逻辑保持完全一致，不做任何修改
     let currentPath = '';
     
     function checkAuth() {
@@ -427,7 +490,7 @@
       const errorEl = document.getElementById('loginError');
       
       if (!password) {
-        errorEl.textContent = '请输入密码';
+        errorEl.textContent = 'Please verify identity';
         errorEl.style.display = 'block';
         return;
       }
@@ -440,12 +503,12 @@
         if (response.ok) {
           checkAuth();
         } else {
-          errorEl.textContent = '密码错误';
+          errorEl.textContent = 'Authentication Failed';
           errorEl.style.display = 'block';
           document.cookie = 'auth_token=; path=/; max-age=0';
         }
       } catch (error) {
-        errorEl.textContent = '登录失败: ' + error.message;
+        errorEl.textContent = 'System Error: ' + error.message;
         errorEl.style.display = 'block';
       }
     }
@@ -457,7 +520,7 @@
     
     async function loadImages(path = '') {
       currentPath = path;
-      document.getElementById('galleryContainer').innerHTML = '<div class="loading">加载中...</div>';
+      document.getElementById('galleryContainer').innerHTML = '<div class="loading">Syncing...</div>';
       document.getElementById('foldersContainer').innerHTML = '';
       
       try {
@@ -472,7 +535,7 @@
         
         const debugInfo = document.getElementById('debugInfo');
         debugInfo.style.display = 'block';
-        debugInfo.innerHTML = `路径: ${path || '/'} | 文件夹: ${data.folders?.length || 0} | 文件: ${data.files?.length || 0}`;
+        debugInfo.innerHTML = `Location: ${path || 'Root'} | Folders: ${data.folders?.length || 0} | Files: ${data.files?.length || 0}`;
         
         updateBreadcrumb(path);
         
@@ -496,9 +559,9 @@
               <div class="image-info">
                 <div class="image-name" title="${file.name}">${file.name}</div>
                 <div class="image-actions">
-                  <button class="btn-copy" onclick="event.stopPropagation(); copyUrl('${file.url}')">复制</button>
-                  <button class="btn-download" onclick="event.stopPropagation(); window.open('${file.url}', '_blank')">查看</button>
-                  <button class="btn-delete" onclick="event.stopPropagation(); deleteImage('${file.key}')">删除</button>
+                  <button class="btn-copy" onclick="event.stopPropagation(); copyUrl('${file.url}')">Copy</button>
+                  <button class="btn-download" onclick="event.stopPropagation(); window.open('${file.url}', '_blank')">Open</button>
+                  <button class="btn-delete" onclick="event.stopPropagation(); deleteImage('${file.key}')">Delete</button>
                 </div>
               </div>
             </div>
@@ -507,9 +570,9 @@
         } else if (!data.folders || data.folders.length === 0) {
           document.getElementById('galleryContainer').innerHTML = `
             <div class="empty">
-              <div class="empty-icon">📷</div>
-              <div style="font-weight:500">暂无照片</div>
-              <div style="font-size:13px; margin-top:4px;">点击上方按钮上传</div>
+              <div class="empty-icon">∅</div>
+              <div style="font-size: 18px;">No Assets</div>
+              <div style="font-size: 14px; opacity: 0.6; margin-top:5px;">Upload or drop files here</div>
             </div>
           `;
         } else {
@@ -518,9 +581,9 @@
       } catch (error) {
         document.getElementById('galleryContainer').innerHTML = `
           <div class="empty">
-            <div class="empty-icon" style="color:var(--danger)">⚠️</div>
-            <div style="color:var(--text-primary)">加载失败</div>
-            <div style="font-size:12px; margin-top:8px;">${error.message}</div>
+            <div class="empty-icon" style="color:#ff3b30">!</div>
+            <div style="color:var(--text-primary)">Sync Error</div>
+            <div style="font-size:13px; margin-top:8px;">${error.message}</div>
           </div>
         `;
       }
@@ -528,7 +591,7 @@
     
     function updateBreadcrumb(path) {
       const parts = path.split('/').filter(p => p);
-      let breadcrumbHtml = '<a onclick="loadImages(\'\')">主页</a>';
+      let breadcrumbHtml = '<a onclick="loadImages(\'\')">Drive</a>';
       let accumulatedPath = '';
       
       parts.forEach((part) => {
@@ -542,18 +605,17 @@
     async function uploadFiles() {
       const files = document.getElementById('fileInput').files;
       if (files.length === 0) {
-        alert('请选择照片');
+        alert('Select files to upload');
         return;
       }
       
       let successCount = 0;
       let failCount = 0;
       
-      // UI Feedback
       const btn = document.querySelector('.toolbar button');
       const originalText = btn.innerText;
-      btn.innerText = '上传中...';
-      btn.style.opacity = '0.6';
+      btn.innerText = 'Processing...';
+      btn.style.opacity = '0.7';
       
       for (const file of files) {
         const formData = new FormData();
@@ -584,12 +646,12 @@
       if (successCount > 0) {
         loadImages(currentPath);
       } else {
-        alert('上传失败');
+        alert('Upload Failed');
       }
     }
     
     async function deleteImage(key) {
-      if (!confirm('确定删除？')) return;
+      if (!confirm('Permanently delete this asset?')) return;
       
       try {
         const response = await fetch('/api/delete', {
@@ -602,23 +664,29 @@
         if (result.success) {
           loadImages(currentPath);
         } else {
-          alert(`删除失败: ${result.error}`);
+          alert(`Error: ${result.error}`);
         }
       } catch (error) {
-        alert(`删除失败: ${error.message}`);
+        alert(`Error: ${error.message}`);
       }
     }
     
     function copyUrl(url) {
       navigator.clipboard.writeText(url).then(() => {
-        // Subtle toast
+        // Futuristic Toast
         const toast = document.createElement('div');
-        toast.innerText = '已复制';
-        toast.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.7); color:white; padding:12px 24px; border-radius:12px; backdrop-filter:blur(10px); font-size:14px; z-index:999;';
+        toast.innerText = 'Link Copied';
+        toast.style.cssText = `
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 15px 30px;
+            border-radius: 30px; font-weight: 600; backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 999;
+            animation: floatIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        `;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 1000);
+        setTimeout(() => toast.remove(), 1500);
       }).catch(err => {
-        alert('复制失败');
+        alert('Copy Failed');
       });
     }
     
